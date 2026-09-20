@@ -13,7 +13,6 @@
 
     <modules>
         <module>BetterTeams</module>
-        <module>extensions</module>
     </modules>
 
     <scm>
@@ -139,12 +138,6 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>org.bstats</groupId>
-                <artifactId>bstats-bukkit</artifactId>
-                <version>${bstats.version}</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
                 <groupId>net.kyori</groupId>
                 <artifactId>adventure-bom</artifactId>
                 <version>${adventure.version}</version>
@@ -166,18 +159,6 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>com.gmail.filoghost.holographicdisplays</groupId>
-                <artifactId>holographicdisplays-api</artifactId>
-                <version>${holographic.displays.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.github.decentsoftware-eu</groupId>
-                <artifactId>decentholograms</artifactId>
-                <version>${decent.holograms.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
                 <groupId>com.sk89q.worldedit</groupId>
                 <artifactId>worldedit-bukkit</artifactId>
                 <version>${worldedit.version}</version>
@@ -194,12 +175,6 @@
                         <artifactId>paperlib</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.songoda</groupId>
-                <artifactId>UltimateClaims</artifactId>
-                <version>${ultimate.claims.version}</version>
-                <scope>provided</scope>
             </dependency>
 
             <!-- Test dependencies -->

@@ -24,27 +24,20 @@ import com.booksaw.betterTeams.cost.CostManager;
 import com.booksaw.betterTeams.customEvents.post.PostBetterTeamsReloadEvent;
 import com.booksaw.betterTeams.events.*;
 import com.booksaw.betterTeams.events.MCTeamManagement.BelowNameType;
-import com.booksaw.betterTeams.extension.ExtensionManager;
-import com.booksaw.betterTeams.integrations.UltimateClaimsManager;
 import com.booksaw.betterTeams.integrations.WorldGuardManagerV7;
-import com.booksaw.betterTeams.integrations.apollo.ApolloManager;
-import com.booksaw.betterTeams.integrations.hologram.DHHologramManager;
-import com.booksaw.betterTeams.integrations.hologram.HDHologramManager;
-import com.booksaw.betterTeams.integrations.hologram.HologramManager;
 import com.booksaw.betterTeams.integrations.placeholder.TeamPlaceholders;
+import com.booksaw.betterTeams.menu.MenuConfig;
+import com.booksaw.betterTeams.menu.MenuListener;
 import com.booksaw.betterTeams.message.MessageManager;
 import com.booksaw.betterTeams.score.ScoreManagement;
 import com.booksaw.betterTeams.team.level.LevelManager;
 import com.booksaw.betterTeams.team.storage.StorageType;
 import com.booksaw.betterTeams.team.storage.convert.Converter;
-import com.booksaw.betterTeams.team.storage.storageManager.SeparatedYamlStorageManager;
 import com.booksaw.betterTeams.team.storage.storageManager.YamlStorageManager;
 import lombok.Getter;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
-import org.bstats.bukkit.Metrics;
-import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -55,6 +48,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -70,7 +64,6 @@ public class Main extends JavaPlugin {
 	public static Economy econ = null;
 	public static Permission perms = null;
 	public static boolean placeholderAPI = false;
-	public boolean useHolograms = false;
 	public MCTeamManagement teamManagement;
 	public ChatManagement chatManagement;
 	public WorldGuardManagerV7 wgManagement;
@@ -85,17 +78,6 @@ public class Main extends JavaPlugin {
 
 	@Getter
 	private TeamPlaceholders teamPlaceholders;
-
-	@Getter
-	ExtensionManager extensionManager;
-
-	/**
-	 * If the ultimateClaims expansion has been enabled
-	 */
-	@Getter
-	private boolean ultimateClaimsEnabled = false;
-
-	private Metrics metrics = null;
 
 	/**
 	 * This is used to store the config file in which the the teams data is stored
@@ -134,8 +116,6 @@ public class Main extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		setupMetrics();
-
 		if (adventure == null) try {
 			adventure = BukkitAudiences.create(this);
 		} catch (Exception e) {
@@ -148,12 +128,11 @@ public class Main extends JavaPlugin {
 		loadCustomConfigs();
 
 		LevelManager.reload();
+		MenuConfig.reload();
 
 		setupStorage();
 
 		ChatManagement.enable();
-
-		setupExtension();
 
 		if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null
 				&& Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("PlaceholderAPI")).isEnabled()) {
@@ -161,16 +140,6 @@ public class Main extends JavaPlugin {
 			teamPlaceholders = new TeamPlaceholders(this);
 			teamPlaceholders.register();
 		}
-
-		if (Bukkit.getPluginManager().getPlugin("UltimateClaims") != null
-				&& Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("UltimateClaims")).isEnabled()) {
-			if (getConfig().getBoolean("ultimateClaims.enabled")) {
-				ultimateClaimsEnabled = true;
-				new UltimateClaimsManager();
-			}
-		}
-
-		useHolograms = setupHolograms();
 
 		if (!setupEconomy() || !getConfig().getBoolean("useVault")) {
 			econ = null;
@@ -187,19 +156,10 @@ public class Main extends JavaPlugin {
 	@Override
 	public void onDisable() {
 
-		if (extensionManager != null) {
-			extensionManager.unloadExtensions();
-		}
-
 		for (Entry<Player, Team> temp : InventoryManagement.adminViewers.entrySet()) {
 			temp.getKey().closeInventory();
 			temp.getValue().saveEchest();
 		}
-
-		if (useHolograms) {
-			HologramManager.holoManager.disable();
-		}
-
 
 		if (teamManagement != null) {
 			teamManagement.removeAll(false);
@@ -274,24 +234,6 @@ public class Main extends JavaPlugin {
 
 	}
 
-	/*
-	 * Determines which holograms plugin the server is running, then creates a new
-	 * HologramManager instance for the respective plugin.
-	 */
-	private boolean setupHolograms() {
-		boolean hdHolos = Bukkit.getPluginManager().isPluginEnabled("HolographicDisplays");
-		if (hdHolos) {
-			new HDHologramManager();
-		}
-		boolean dhHolos = Bukkit.getPluginManager().isPluginEnabled("DecentHolograms");
-		// Check to make sure the server isn't running both hologram plugins.
-		// We don't need two HologramManager instances.
-		if (!hdHolos && dhHolos) {
-			new DHHologramManager();
-		}
-		return hdHolos || dhHolos;
-	}
-
 	private boolean setupEconomy() {
 		if (getServer().getPluginManager().getPlugin("Vault") == null) {
 			return false;
@@ -341,7 +283,7 @@ public class Main extends JavaPlugin {
 				new ChatCommand(teamCommand), new ColorCommand(), new TitleCommand(), new TopCommand(),
 				new BaltopCommand(), new RankCommand(), new DelhomeCommand(), new AllyCommand(), new NeutralCommand(),
 				new AllyChatCommand(teamCommand), new ListCommand(), new WarpCommand(), new SetWarpCommand(),
-				new DelwarpCommand(), new WarpsCommand(), new EchestCommand(), new RankupCommand(), new TagCommand());
+				new DelwarpCommand(), new WarpsCommand(), new EchestCommand(), new RankupCommand(), new TagCommand(), new LevelsCommand());
 
 		if (getConfig().getBoolean("anchor.enable")) {
 			teamCommand.addSubCommands(new AnchorCommand(), new SetAnchorCommand());
@@ -398,16 +340,13 @@ public class Main extends JavaPlugin {
 		teamaMetaCommand.addSubCommands(new MetaSetTeama(), new MetaGetTeama(), new MetaRemoveTeama());
 		teamaCommand.addSubCommand(teamaMetaCommand);
 
-		if (useHolograms) {
-			ParentCommand teamaHoloCommand = new ParentCommand("holo");
-			teamaHoloCommand.addSubCommands(new CreateHoloTeama(), new RemoveHoloTeama());
-			teamaCommand.addSubCommand(teamaHoloCommand);
-		}
-
 		if (econ != null) {
 			teamCommand.addSubCommands(new DepositCommand(teamCommand), new BalCommand(),
 					new WithdrawCommand(teamCommand));
 		}
+
+		new BooksawCommand("teamlist", new TeamListCommand(), "betterteams.teamlist",
+				"Browse all teams and their members in a menu", List.of());
 
 		new BooksawCommand("teamadmin", teamaCommand, "betterteams.admin", "All admin commands for teams",
 				getConfig().getStringList("command.teama"));
@@ -436,12 +375,9 @@ public class Main extends JavaPlugin {
 
 		getServer().getPluginManager().registerEvents((chatManagement = new ChatManagement()), this);
 		getServer().getPluginManager().registerEvents(new ScoreManagement(), this);
+		getServer().getPluginManager().registerEvents(new MenuListener(), this);
 		getServer().getPluginManager().registerEvents(new AllyManagement(), this);
 		getServer().getPluginManager().registerEvents(new MessagesManagement(), this);
-
-		if (getConfig().getBoolean("checkUpdates")) {
-			getServer().getPluginManager().registerEvents(new UpdateChecker(this), this);
-		}
 
 		// disabling the chest checks (hoppers most importantly) to reduce needless
 		// performance cost
@@ -454,27 +390,6 @@ public class Main extends JavaPlugin {
 		if (getConfig().getBoolean("anchor.enable")) {
 			homeAnchorManagement = new HomeAnchorManagement(this);
 			homeAnchorManagement.registerEvent();
-		}
-
-		if (getConfig().getBoolean("apollo.teamview.enabled", true)) {
-			new ApolloManager();
-		}
-	}
-
-	public void setupMetrics() {
-		if (metrics == null) {
-			int pluginId = 7855;
-			metrics = new Metrics(this, pluginId);
-			metrics.addCustomChart(new SimplePie("language", () -> getConfig().getString("language")));
-			metrics.addCustomChart(new SimplePie("storage_type", () -> getConfig().getString("storageType")));
-			metrics.addCustomChart(new SimplePie("team_count", () -> {
-				if (Team.getTeamManager() instanceof SeparatedYamlStorageManager) {
-					return ((((SeparatedYamlStorageManager) Team.getTeamManager()).getTeamNameLookupSize() / 200) * 200) + "+";
-
-				}
-				return null;
-			}));
-			metrics.addCustomChart(new SimplePie("player_count", () -> ((Bukkit.getOnlinePlayers().size() / 20) * 20) + "+"));
 		}
 	}
 
@@ -491,7 +406,7 @@ public class Main extends JavaPlugin {
 		}
 
 		YamlConfiguration teamStorage = YamlConfiguration.loadConfiguration(f);
-		StorageType from = StorageType.getStorageType(teamStorage.getString("storageType", "FLATFILE"));
+		StorageType from = StorageType.getStorageType(teamStorage.getString("storageType", "YAML"));
 		StorageType to = StorageType.getStorageType(getConfig().getString("storageType", ""));
 
 		if (from != to) {
@@ -508,19 +423,5 @@ public class Main extends JavaPlugin {
 
 		Team.setupTeamManager(to);
 		Team.getTeamManager().loadTeams();
-	}
-
-	public void setupExtension() {
-		extensionManager = new ExtensionManager(this, new File(getDataFolder(), "extensions"));
-		extensionManager.initializeExtensions();
-
-		int enableTick = getConfig().getInt("extension.enableTick", 1);
-		if (enableTick <= 0) {
-			extensionManager.enableExtensions();
-		} else {
-			// Run later
-			Bukkit.getScheduler().runTaskLater(this, () ->
-					extensionManager.enableExtensions(), enableTick);
-		}
 	}
 }

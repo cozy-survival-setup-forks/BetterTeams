@@ -394,6 +394,7 @@ help.withdraw: Withdraw money from the teams balance
 help.title: Change that players title within the team
 help.top: View the top teams
 help.rank: View the rank of a team
+help.levels: View all team levels and what they give
 help.join: Join the specified team
 help.delhome: Delete your team's home
 help.ally: Used to request an alliance with another team
@@ -419,6 +420,7 @@ helpArg.leave: ''
 helpArg.sethome: ''
 helpArg.create: <name> [tag]
 helpArg.rank: '[team]'
+helpArg.levels: '[team]'
 helpArg.join: <team>
 helpArg.tag: '[tag]'
 helpArg.disband: ''
@@ -477,6 +479,7 @@ command.delwarp: delwarp
 command.warps: warps
 command.echest: echest
 command.rankup: rankup
+command.levels: levels
 command.tag: tag
 command.pvp: pvp
 command.claim: claim

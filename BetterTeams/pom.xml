@@ -33,10 +33,6 @@
             <artifactId>spigot-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.bstats</groupId>
-            <artifactId>bstats-bukkit</artifactId>
-        </dependency>
-        <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-text-minimessage</artifactId>
             <scope>compile</scope>
@@ -74,24 +70,12 @@
             <artifactId>VaultAPI</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.gmail.filoghost.holographicdisplays</groupId>
-            <artifactId>holographicdisplays-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.github.decentsoftware-eu</groupId>
-            <artifactId>decentholograms</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-bukkit</artifactId>
         </dependency>
         <dependency>
             <groupId>com.sk89q.worldguard</groupId>
             <artifactId>worldguard-bukkit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.songoda</groupId>
-            <artifactId>UltimateClaims</artifactId>
         </dependency>
 
         <!-- Test dependencies -->
@@ -133,10 +117,6 @@
                 <version>3.6.2</version>
                 <configuration>
                     <relocations>
-                        <relocation>
-                            <pattern>org.bstats</pattern>
-                            <shadedPattern>booksawshaded.com.org.bstats</shadedPattern>
-                        </relocation>
                         <relocation>
                             <pattern>com.tcoded.folialib</pattern>
                             <shadedPattern>com.booksaw.betterTeams.lib.folialib</shadedPattern>

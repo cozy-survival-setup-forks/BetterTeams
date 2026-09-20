@@ -1719,6 +1719,6 @@ public class Team {
 	}
 
 	public TeamLevel getLevelObject() {
-		return LevelManager.getLevel(this.level);
+		return LevelManager.getLevelOrClosest(this.level);
 	}
 }

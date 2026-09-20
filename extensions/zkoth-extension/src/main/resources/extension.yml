@@ -1,5 +1,0 @@
-name: ZKothExtension
-version: ${project.version}
-author: booksaw
-main: com.booksaw.betterTeams.extensions.zkoth.ZKothExtension
-plugin-depend: [ ZKoth ]

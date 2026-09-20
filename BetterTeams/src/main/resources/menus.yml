@@ -1,0 +1,87 @@
+# The look of the menus. Text is MiniMessage (<green>text</green>), old & codes work too.
+# Reload with /teamadmin reload.
+
+# /teamlist: every team on the server, click one to see its members
+teamlist:
+  title-teams: "<black>| Teams - List (<page>/<pages>)"
+  title-members: "<black>| Teams - <team> (<page>/<pages>)"
+  filler: BLACK_STAINED_GLASS_PANE
+  # the name of a team is coloured with the colour of the team
+  team:
+    name: "<accent><bold><team>"
+    # <description> becomes up to 3 lines, <leader> and <members> are filled in
+    lines:
+      - "<#B6C1C8>Teams"
+      - ""
+      - "<#FF9558>Description:"
+      - "<description>"
+      - ""
+      - "<#FF9558>Information:"
+      - "<#74C7FF>★ <white>Leader: <#74C7FF><leader>"
+      - "<#FFE05A>⚡ <white>Members: <#FFE05A><members>"
+      - ""
+      - "<#FF9558>⏵ <bold><underlined>CLICK</underlined></bold> to View Members"
+    no-description: "No description set."
+  member:
+    name: "<accent><bold><player>"
+    lines:
+      - "<#B6C1C8>Teams"
+      - ""
+      - "<#FF9558>Information:"
+      - "<accent>● <white>Rank: <accent><rank>"
+      - "<status-color>● <white>Status: <status-color><status>"
+    rank-owner: "Owner"
+    rank-admin: "Admin"
+    rank-member: "Member"
+    online: "Online"
+    offline: "Offline"
+  empty:
+    name: "<#FF4361><bold>NO TEAMS FOUND"
+    lines:
+      - "<#B6C1C8>Teams"
+      - ""
+      - "<#FF9558>Description:"
+      - "<white>There are currently no"
+      - "<white>teams to display."
+  next:
+    name: "<#41FF75><bold>NEXT PAGE"
+    lines:
+      - "<#B6C1C8>Teams"
+      - ""
+      - "<#FF9558>Description:"
+      - "<white>Click this button to"
+      - "<white>continue to the next page."
+      - ""
+      - "<#FF9558>⏵ <bold><underlined>CLICK</underlined></bold> to Continue"
+  previous:
+    name: "<#FF4361><bold>PREVIOUS PAGE"
+    lines:
+      - "<#B6C1C8>Teams"
+      - ""
+      - "<#FF9558>Description:"
+      - "<white>Click this button to"
+      - "<white>return to the previous page."
+      - ""
+      - "<#FF9558>⏵ <bold><underlined>CLICK</underlined></bold> to Continue"
+  return:
+    name: "<#FF4361><bold>RETURN"
+    # what the button does in the list of teams: close the menu, or run a command as the player
+    # for example "teams" to go back to another menu
+    command: ""
+    lines-list:
+      - "<#B6C1C8>Teams"
+      - ""
+      - "<#FF9558>Description:"
+      - "<white>Click this button to"
+      - "<white>close this menu."
+      - ""
+      - "<#FF9558>⏵ <bold><underlined>CLICK</underlined></bold> to Return"
+    lines-members:
+      - "<#B6C1C8>Teams"
+      - ""
+      - "<#FF9558>Description:"
+      - "<white>Click this button to"
+      - "<white>return to the team list."
+      - ""
+      - "<#FF9558>⏵ <bold><underlined>CLICK</underlined></bold> to Return"
+  gone: "<#FFEE64><bold>TEAMS</bold> <#B6C1C8>⏵ <white>That team no longer exists."

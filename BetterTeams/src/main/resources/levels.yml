@@ -1,0 +1,114 @@
+# Team levels
+#
+# Every team starts at level 1 and ranks up with /team rankup. Add as many levels as you want, they
+# have to be numbered 1, 2, 3... without gaps. Reload with /teamadmin reload.
+#
+# Every level can set:
+#   name              shown in the menu, defaults to "Level <number>"
+#   icon              the item in /team levels
+#   price             what it costs to reach this level from the one before (ignored for level 1)
+#   price-type        money (taken from the team bank, needs Vault) or score
+#   limits            how much a team of this level is allowed, -1 means no limit
+#     members         players in the team
+#     chests          claimed chests
+#     warps           team warps
+#     admins          admins (the rank below owner)
+#     owners          owners, ignored when singleOwner is on in config.yml
+#     balance         money the team bank can hold, 0 means the team has no bank
+#   description       extra lines in the menu, & colour codes work
+#   commands-on-reach commands run by the console when a team reaches the level
+#   commands-on-leave commands run when a team leaves the level (ranks up from it)
+#                     in both lists %team% is the team name, %level% the level and %player% runs the
+#                     command once for every player in the team
+levels:
+  1:
+    name: "Level 1"
+    icon: CHEST
+    limits:
+      members: 5
+      chests: 2
+      warps: 1
+      admins: 1
+      owners: 1
+      balance: 50000
+    description:
+      - "This is the default level for all teams"
+  2:
+    name: "Level 2"
+    icon: BARREL
+    price: 25000
+    price-type: money
+    limits:
+      members: 7
+      chests: 5
+      warps: 2
+      admins: 2
+      owners: 1
+      balance: 100000
+  3:
+    name: "Level 3"
+    icon: ENDER_CHEST
+    price: 50000
+    price-type: money
+    limits:
+      members: 10
+      chests: 8
+      warps: 3
+      admins: 3
+      owners: 1
+      balance: 200000
+  4:
+    name: "Level 4"
+    icon: SHULKER_BOX
+    price: 100000
+    price-type: money
+    limits:
+      members: 15
+      chests: 12
+      warps: 4
+      admins: 4
+      owners: 1
+      balance: 300000
+  5:
+    name: "Level 5"
+    icon: NETHER_STAR
+    price: 250000
+    price-type: money
+    limits:
+      members: 20
+      chests: 20
+      warps: 5
+      admins: 5
+      owners: 1
+      balance: 500000
+
+# The look of /team levels. Text is MiniMessage (<green>text</green>), old & codes work too.
+# Placeholders: <level> <name> <previous> <next> <next-name> <next-price>
+#               <members> <chests> <warps> <admins> <owners> <balance> <price> <team>
+menu:
+  title: "<black>| Team Levels"
+  filler: BLACK_STAINED_GLASS_PANE
+  name: "<green><bold><name>"
+  # the lines of every level, then its description, then the lines below
+  lines:
+    - "<gray>Team Levels"
+    - ""
+    - "<green>Limits:"
+    - "<gray>➥ <white>Player Limit: <green><members>"
+    - "<gray>➥ <white>Chest Limit: <green><chests>"
+    - "<gray>➥ <white>Warp Limit: <green><warps>"
+    - "<gray>➥ <white>Admin Limit: <green><admins>"
+    - "<gray>➥ <white>Balance Limit: <green><balance>"
+  # shown from level 2 up
+  requirement: "<white>Your team must be level <green><previous><white> to rankup to this level."
+  # shown when there is a level after this one
+  next-money: "<white>Rank up to level <green><next><white> by having <green><next-price><white> in the team bank and doing <green>/team rankup<white>."
+  next-score: "<white>Rank up to level <green><next><white> by having <green><next-price> score<white> and doing <green>/team rankup<white>."
+  # shown on the last level
+  max: "<white>This is the Maximum Team Level."
+  # shown on the level the team is at (the item also glows)
+  current: "<yellow>Your team is at this level."
+  # how -1 is written
+  unlimited: "Unlimited"
+  # written in front of money
+  money-symbol: "$"

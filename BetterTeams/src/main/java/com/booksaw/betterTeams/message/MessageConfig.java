@@ -2,7 +2,6 @@ package com.booksaw.betterTeams.message;
 
 import com.booksaw.betterTeams.ConfigManager;
 import com.booksaw.betterTeams.Main;
-import com.booksaw.betterTeams.extension.BetterTeamsExtension;
 import com.booksaw.betterTeams.util.StringUtil;
 import lombok.Getter;
 import org.bukkit.OfflinePlayer;
@@ -40,26 +39,13 @@ public class MessageConfig {
     @Getter
     private ConfigManager configManager;
 
-    @Nullable
-    private final BetterTeamsExtension extension;
-
     /**
      * Creates a MessageConfig for the main plugin.
      *
      * @param language The language code to load
      */
     public MessageConfig(@NotNull String language) {
-        this(language, Main.plugin.getDataFolder(), Main.plugin.getLogger(), "BetterTeams", null);
-    }
-
-    /**
-     * Creates a MessageConfig for an extension.
-     *
-     * @param language  The language code to load
-     * @param extension The extension this config belongs to
-     */
-    public MessageConfig(@NotNull String language, @NotNull BetterTeamsExtension extension) {
-        this(language, extension.getDataFolder(), extension.getLogger().logger(), extension.getInfo().getName(), extension);
+        this(language, Main.plugin.getDataFolder(), Main.plugin.getLogger(), "BetterTeams");
     }
 
     /**
@@ -68,15 +54,13 @@ public class MessageConfig {
      * @param dataFolder The folder to load/save config files
      * @param logger     The logger to use
      * @param sourceName The name of the source (for logging)
-     * @param extension  The extension (null for main plugin)
      */
     public MessageConfig(@NotNull String language, @NotNull File dataFolder, @NotNull Logger logger,
-                         @NotNull String sourceName, @Nullable BetterTeamsExtension extension) {
+                         @NotNull String sourceName) {
         this.language = language;
         this.dataFolder = dataFolder;
         this.logger = logger;
         this.sourceName = sourceName;
-        this.extension = extension;
         this.cache = new ConcurrentHashMap<>();
 
         reload();
@@ -94,7 +78,7 @@ public class MessageConfig {
         this.language = language;
         clearCache();
 
-        this.configManager = new ConfigManager(language, true, extension);
+        this.configManager = new ConfigManager(language, true);
 
         // Load messages into cache
         loadMessages(configManager.getConfig(), false);

@@ -9,13 +9,8 @@ api-version: 1.21
 
 softdepend:
   - PlaceholderAPI
-  - HolographicDisplays
   - Vault
   - WorldGuard
-  - UltimateClaims
-  - DecentHolograms
-  - zKoth
-  - LuckPerms
 
 permissions:
   betterTeams.standard:
@@ -117,6 +112,12 @@ permissions:
   betterTeams.baltop:
     default: true
     description: Allows access to /team baltop
+  betterTeams.levels:
+    default: true
+    description: Allows access to /team levels
+  betterTeams.teamlist:
+    default: true
+    description: Allows access to /teamlist
   betterTeams.rank:
     default: true
     description: Allows access to /team rank

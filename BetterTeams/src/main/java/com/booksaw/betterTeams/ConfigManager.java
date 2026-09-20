@@ -1,6 +1,5 @@
 package com.booksaw.betterTeams;
 
-import com.booksaw.betterTeams.extension.BetterTeamsExtension;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -24,22 +23,14 @@ public class ConfigManager {
 	private final String resourceName;
 	private final String filePath;
 
-	private final BetterTeamsExtension extension;
-
 	public ConfigManager(String resourceName, boolean updateChecks) {
-		this(resourceName, updateChecks, null);
-	}
-
-	public ConfigManager(String resourceName, boolean updateChecks, BetterTeamsExtension extension) {
-		this.extension = extension;
-
 		if (!resourceName.endsWith(".yml")) {
 			resourceName = resourceName + ".yml";
 		}
 
 		this.resourceName = resourceName;
 
-		File folder = (extension != null) ? extension.getDataFolder() : Main.plugin.getDataFolder();
+		File folder = Main.plugin.getDataFolder();
 		File f = new File(folder, resourceName);
 		this.filePath = f.getPath();
 
@@ -61,9 +52,7 @@ public class ConfigManager {
 	 * @param resourceName The name of the resource within the jar file
 	 * @param filePath     The path to save the resource to
 	 */
-	public ConfigManager(String resourceName, String filePath, BetterTeamsExtension extension) {
-		this.extension = extension;
-
+	public ConfigManager(String resourceName, String filePath) {
 		if (!resourceName.endsWith(".yml")) {
 			resourceName = resourceName + ".yml";
 		}
@@ -74,7 +63,7 @@ public class ConfigManager {
 			filePath = filePath + ".yml";
 		}
 
-		File folder = (extension != null) ? extension.getDataFolder() : Main.plugin.getDataFolder();
+		File folder = Main.plugin.getDataFolder();
 		File f = new File(folder, filePath);
 
 		this.filePath = f.getPath();
@@ -84,10 +73,6 @@ public class ConfigManager {
 		}
 		config = YamlConfiguration.loadConfiguration(f);
 
-	}
-
-	public ConfigManager(String resourceName, String filePath) {
-		this(resourceName, filePath, null);
 	}
 
 	public void save() {
@@ -117,9 +102,7 @@ public class ConfigManager {
 			log(Level.INFO, "Checking if the file " + resourceName + " is up to date");
 		}
 
-		InputStream resourceStream = (extension != null)
-				? extension.getResource(resourceName)
-				: Main.plugin.getResource(resourceName);
+		InputStream resourceStream = Main.plugin.getResource(resourceName);
 
 		List<String> changes = updateFileConfig(resourceStream);
 		boolean migratedVariables = migrateVariables(log);
@@ -236,14 +219,11 @@ public class ConfigManager {
 		if (outDir != null && !outDir.exists())
 			outDir.mkdirs();
 
-		InputStream in = (extension != null)
-				? extension.getResource(resourcePath)
-				: Main.plugin.getResource(resourcePath);
+		InputStream in = Main.plugin.getResource(resourcePath);
 
 		if (in == null) {
-			File dataFolder = (extension != null) ? extension.getDataFolder() : Main.plugin.getDataFolder();
 			throw new IllegalArgumentException(
-					"The embedded resource '" + resourcePath + "' cannot be found in " + dataFolder);
+					"The embedded resource '" + resourcePath + "' cannot be found in " + Main.plugin.getDataFolder());
 		}
 
 		try (InputStream inputStream = in) {
@@ -254,18 +234,11 @@ public class ConfigManager {
 	}
 
 	private void log(Level level, String message) {
-		if (extension != null) {
-			extension.getLogger().log(level, message);
-		} else {
-			Main.plugin.getLogger().log(level, "[BetterTeams] " + message);
-		}
+		Main.plugin.getLogger().log(level, "[BetterTeams] " + message);
 	}
+
 	private void log(Level level, String message, Throwable ex) {
-		if (extension != null) {
-			extension.getLogger().log(level, message, ex);
-		} else {
-			Main.plugin.getLogger().log(level, "[BetterTeams] " + message, ex);
-		}
+		Main.plugin.getLogger().log(level, "[BetterTeams] " + message, ex);
 	}
 
 }

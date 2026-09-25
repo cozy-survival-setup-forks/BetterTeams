@@ -216,29 +216,6 @@ public class SQLTeamStorage extends TeamStorage {
 				serial, getTeamId());
 	}
 
-	@Override
-	public List<String> getWarps() {
-
-		List<String> toReturn = new ArrayList<>();
-
-		try (PreparedStatement ps = storageManager.getDatabase()
-				.selectWhere("*", TableName.WARPS, getCondition(), getTeamId())) {
-
-			ResultSet result = ps.executeQuery();
-			if (!result.first()) {
-				return toReturn;
-			}
-			do {
-
-				toReturn.add(result.getString("warpInfo"));
-
-			} while (result.next());
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return toReturn;
-	}
 
 	@Override
 	public List<String> getClaimedChests() {
@@ -307,19 +284,7 @@ public class SQLTeamStorage extends TeamStorage {
 				"receivingTeamID = ? AND requestingTeamID = ?", getTeamId(), requesting.toString());
 	}
 
-	@Override
-	public void addWarp(Warp component) {
-		invalidateCache();
-		storageManager.getDatabase().insertRecord(TableName.WARPS, "teamID, warpInfo",
-				getTeamId(), component.toString());
-	}
 
-	@Override
-	public void removeWarp(Warp component) {
-		invalidateCache();
-		storageManager.getDatabase().deleteRecord(TableName.WARPS,
-				getCondition() + " AND warpInfo = ?", getTeamId(), component.toString());
-	}
 
 	@Override
 	public void promotePlayer(TeamPlayer promotePlayer) {
@@ -378,10 +343,6 @@ public class SQLTeamStorage extends TeamStorage {
 		// not needed
 	}
 
-	@Override
-	public void setWarps(List<String> warps) {
-		// not needed
-	}
 
 	@Override
 	public void setClaimedChests(List<String> chests) {

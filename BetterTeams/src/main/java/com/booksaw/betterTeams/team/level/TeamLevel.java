@@ -41,7 +41,6 @@ public final class TeamLevel {
 
 	private final int teamLimit;
 	private final int maxChests;
-	private final int maxWarps;
 	private final int maxAdmins;
 	private final int maxOwners;
 	private final double maxBalance;
@@ -51,7 +50,7 @@ public final class TeamLevel {
 	private final List<String> endCommands;
 
 	public TeamLevel(int level, String name, String iconName, double price, PriceType priceType, int teamLimit,
-	                 int maxChests, int maxWarps, int maxAdmins, int maxOwners, double maxBalance,
+	                 int maxChests, int maxAdmins, int maxOwners, double maxBalance,
 	                 List<String> description, List<String> startCommands, List<String> endCommands) {
 		this.level = level;
 		this.name = name;
@@ -60,7 +59,6 @@ public final class TeamLevel {
 		this.priceType = priceType;
 		this.teamLimit = teamLimit;
 		this.maxChests = maxChests;
-		this.maxWarps = maxWarps;
 		this.maxAdmins = maxAdmins;
 		this.maxOwners = maxOwners;
 		this.maxBalance = maxBalance;

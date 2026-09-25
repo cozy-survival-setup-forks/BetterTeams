@@ -282,8 +282,8 @@ public class Main extends JavaPlugin {
 				new HomeCommand(), new SethomeCommand(), new BanCommand(), new UnbanCommand(),
 				new ChatCommand(teamCommand), new ColorCommand(), new TitleCommand(), new TopCommand(),
 				new BaltopCommand(), new RankCommand(), new DelhomeCommand(), new AllyCommand(), new NeutralCommand(),
-				new AllyChatCommand(teamCommand), new ListCommand(), new WarpCommand(), new SetWarpCommand(),
-				new DelwarpCommand(), new WarpsCommand(), new EchestCommand(), new RankupCommand(), new TagCommand(), new LevelsCommand());
+				new AllyChatCommand(teamCommand), new ListCommand(),
+				new EchestCommand(), new RankupCommand(), new TagCommand(), new LevelsCommand());
 
 		if (getConfig().getBoolean("anchor.enable")) {
 			teamCommand.addSubCommands(new AnchorCommand(), new SetAnchorCommand());
@@ -309,8 +309,8 @@ public class Main extends JavaPlugin {
 		teamaCommand.addSubCommands(new ReloadTeama(), new ChatSpyTeama(), new TitleTeama(),
 				new VersionTeama("version"), new VersionTeama("debug"), new HomeTeama(), new NameTeama(),
 				new DescriptionTeama(), new OpenTeama(), new InviteTeama(), new CreateTeama(), new JoinTeama(),
-				new LeaveTeama(), new PromoteTeama(), new DemoteTeama(), new WarpTeama(), new SetwarpTeama(),
-				new DelwarpTeama(), new PurgeTeama(), new DisbandTeama(), new ColorTeama(), new EchestTeama(),
+				new LeaveTeama(), new PromoteTeama(), new DemoteTeama(), 
+				 new PurgeTeama(), new DisbandTeama(), new ColorTeama(), new EchestTeama(),
 				new SetrankTeama(teamaCommand), new TagTeama(), new TeleportTeama(teamaCommand), new AllyTeama(),
 				new NeutralTeama(), new ImportmessagesTeama());
 

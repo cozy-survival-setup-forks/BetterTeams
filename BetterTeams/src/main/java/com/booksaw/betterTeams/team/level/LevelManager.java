@@ -88,7 +88,7 @@ public class LevelManager {
 
 		if (levels.isEmpty()) {
 			logger.severe("levels.yml has no levels, using a single default level.");
-			levels.put(1, new TeamLevel(1, "Level 1", "CHEST", 0, TeamLevel.PriceType.MONEY, 10, 2, 2, -1, 1,
+			levels.put(1, new TeamLevel(1, "Level 1", "CHEST", 0, TeamLevel.PriceType.MONEY, 10, 2, -1, 1,
 					-1, List.of(), List.of(), List.of()));
 		}
 	}
@@ -119,7 +119,6 @@ public class LevelManager {
 				priceType,
 				limits.getInt("members", 10),
 				limits.getInt("chests", 0),
-				limits.getInt("warps", 0),
 				limits.getInt("admins", -1),
 				limits.getInt("owners", 1),
 				limits.getDouble("balance", -1),
@@ -177,7 +176,6 @@ public class LevelManager {
 			out.set(base + "price-type", price.endsWith("s") ? "score" : "money");
 			out.set(base + "limits.members", level.getInt("teamLimit", 10));
 			out.set(base + "limits.chests", level.getInt("maxChests", 0));
-			out.set(base + "limits.warps", level.getInt("maxWarps", 0));
 			out.set(base + "limits.admins", level.getInt("maxAdmins", -1));
 			out.set(base + "limits.owners", level.getInt("maxOwners", 1));
 			out.set(base + "limits.balance", level.getDouble("maxBal", -1));

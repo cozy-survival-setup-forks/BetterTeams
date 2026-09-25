@@ -3,7 +3,7 @@ package com.booksaw.betterTeams.database;
 import com.booksaw.betterTeams.Main;
 
 public enum TableName {
-	TEAM("Team"), PLAYERS("Players"), ALLYREQUESTS("AllyRequests"), WARPS("warps"), CHESTCLAIMS("ChestClaims"),
+	TEAM("Team"), PLAYERS("Players"), ALLYREQUESTS("AllyRequests"), CHESTCLAIMS("ChestClaims"),
 	BANS("Bans"), ALLIES("Allies"), TEAM_META("TeamMeta");
 
 	private final String tableName;

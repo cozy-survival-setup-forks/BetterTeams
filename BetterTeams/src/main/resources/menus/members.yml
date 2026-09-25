@@ -1,0 +1,85 @@
+# The members of a team, opened by clicking a team in /teamlist.
+# Same format as teamlist.yml. Reload with /teamadmin reload.
+#
+# Tags: <team> <page> <pages> in the title and every item.
+# In the member item: <player> <rank> <status>, <accent> the colour of the rank, <status-color>.
+# view_requirement: has_previous, has_next
+# [back] goes back to the page of the team list this menu was opened from.
+menu_title: "<black>| Teams - <team> (<page>/<pages>)"
+size: 54
+
+items:
+  filler:
+    material: BLACK_STAINED_GLASS_PANE
+    display_name: " "
+    slots: [45-53]
+
+  # drawn once for every member on the page, filled into these slots in order, with the head of the player
+  member:
+    material: PLAYER_HEAD
+    slots: [0-44]
+    display_name: "<accent><bold><player>"
+    lore:
+      - "<#B6C1C8>Teams"
+      - ""
+      - "<#FF9558>Information:"
+      - "<accent>● <white>Rank: <accent><rank>"
+      - "<status-color>● <white>Status: <status-color><status>"
+    rank-owner: "Owner"
+    rank-admin: "Admin"
+    rank-member: "Member"
+    online: "Online"
+    offline: "Offline"
+
+  previous:
+    material: RED_STAINED_GLASS_PANE
+    slot: 47
+    view_requirement: has_previous
+    display_name: "<#FF4361><bold>PREVIOUS PAGE"
+    lore:
+      - "<#B6C1C8>Teams"
+      - ""
+      - "<#FF9558>Description:"
+      - "<white>Click this button to"
+      - "<white>return to the previous page."
+      - ""
+      - "<#FF9558>⏵ <bold><underlined>CLICK</underlined></bold> to Continue"
+    click_commands:
+      - "[sound] UI_BUTTON_CLICK"
+      - "[sound] BLOCK_AMETHYST_BLOCK_RESONATE"
+      - "[previous]"
+
+  return:
+    material: GLOBE_BANNER_PATTERN
+    slot: 49
+    display_name: "<#FF4361><bold>RETURN"
+    lore:
+      - "<#B6C1C8>Teams"
+      - ""
+      - "<#FF9558>Description:"
+      - "<white>Click this button to"
+      - "<white>return to the team list."
+      - ""
+      - "<#FF9558>⏵ <bold><underlined>CLICK</underlined></bold> to Return"
+    click_commands:
+      - "[sound] UI_BUTTON_CLICK"
+      - "[sound] BLOCK_NOTE_BLOCK_BASS 0.3"
+      - "[back]"
+
+  next:
+    material: LIME_STAINED_GLASS_PANE
+    slot: 51
+    view_requirement: has_next
+    display_name: "<#41FF75><bold>NEXT PAGE"
+    lore:
+      - "<#B6C1C8>Teams"
+      - ""
+      - "<#FF9558>Description:"
+      - "<white>Click this button to"
+      - "<white>continue to the next page."
+      - ""
+      - "<#FF9558>⏵ <bold><underlined>CLICK</underlined></bold> to Continue"
+    click_commands:
+      - "[sound] UI_BUTTON_CLICK"
+      - "[sound] BLOCK_AMETHYST_BLOCK_RESONATE"
+      - "[next]"

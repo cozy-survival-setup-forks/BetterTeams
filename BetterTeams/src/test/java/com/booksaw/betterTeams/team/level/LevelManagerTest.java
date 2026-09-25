@@ -35,7 +35,6 @@ class LevelManagerTest {
 		TeamLevel first = LevelManager.getLevel(1);
 		assertEquals(5, first.getTeamLimit());
 		assertEquals(2, first.getMaxChests());
-		assertEquals(1, first.getMaxWarps());
 		assertEquals(1, first.getMaxAdmins());
 		assertEquals(50000, first.getMaxBalance());
 
@@ -126,7 +125,6 @@ class LevelManagerTest {
 
 		TeamLevel one = LevelManager.getLevel(1);
 		assertEquals(10, one.getTeamLimit());
-		assertEquals(3, one.getMaxWarps());
 		assertEquals(2, one.getMaxOwners());
 		assertEquals("&7The first level", one.getDescription().get(0));
 

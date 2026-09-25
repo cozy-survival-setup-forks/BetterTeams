@@ -285,7 +285,6 @@ public class Team {
 	private String tag;
 
 	@Getter
-	private final WarpSetComponent warps = new WarpSetComponent();
 
 	private org.bukkit.scoreboard.Team team;
 
@@ -339,7 +338,6 @@ public class Team {
 			teamHome = LocationSetComponent.getLocation(teamHomeStr);
 		}
 		allyRequests.load(storage);
-		warps.load(storage);
 
 		try {
 			claims.load(storage);
@@ -1522,32 +1520,9 @@ public class Team {
 		return allies.size() >= limit;
 	}
 
-	/**
-	 * Used to save all warps that this team has set
-	 */
-	public void saveWarps() {
-		warps.save(storage);
-	}
 
-	/**
-	 * Used to get a warp with the specified name
-	 *
-	 * @param name the name of the warp
-	 * @return the warp with that name
-	 */
-	public Warp getWarp(String name) {
-		return warps.get(name);
-	}
 
-	public void addWarp(Warp warp) {
-		warps.add(this, warp);
-		saveWarps();
-	}
 
-	public void delWarp(String name) {
-		warps.remove(this, getWarp(name));
-		saveWarps();
-	}
 
 	/**
 	 * Used to get a list of all the online players that are on this team
@@ -1609,9 +1584,6 @@ public class Team {
 		return echest;
 	}
 
-	public int getMaxWarps() {
-		return getLevelObject().getMaxWarps();
-	}
 
 	public int getMaxChests() {
 		return getLevelObject().getMaxChests();

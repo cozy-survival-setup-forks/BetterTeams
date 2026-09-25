@@ -2,7 +2,6 @@ package com.booksaw.betterTeams.team.storage.team;
 
 import com.booksaw.betterTeams.Team;
 import com.booksaw.betterTeams.TeamPlayer;
-import com.booksaw.betterTeams.Warp;
 
 import com.booksaw.betterTeams.team.meta.TeamMeta;
 import org.bukkit.inventory.Inventory;
@@ -149,9 +148,7 @@ public abstract class TeamStorage {
 
 	public abstract void setEchestContents(Inventory inventory);
 
-	public abstract List<String> getWarps();
 
-	public abstract void setWarps(List<String> warps);
 
 	public abstract List<String> getClaimedChests();
 
@@ -169,9 +166,7 @@ public abstract class TeamStorage {
 
 	public abstract void removeAllyRequest(UUID requesting);
 
-	public abstract void addWarp(Warp component);
 
-	public abstract void removeWarp(Warp component);
 
 	public abstract void promotePlayer(TeamPlayer promotePlayer);
 

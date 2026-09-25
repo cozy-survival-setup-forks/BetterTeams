@@ -11,19 +11,21 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * /team levels: every level with its limits and what it costs to reach.
+ * /team levels: every level with its limits and what it costs to reach. The layout is in menus/levels.yml.
  */
 public class LevelsMenu implements Menu {
 
-	private static final int PER_ROW = 7;
-
+	private final Map<Integer, List<String>> commands = new HashMap<>();
 	private Inventory inventory;
 
 	/**
@@ -39,31 +41,38 @@ public class LevelsMenu implements Menu {
 	}
 
 	private void build(@Nullable Team team) {
-		ConfigurationSection config = MenuConfig.levelsMenu();
+		MenuDef def = MenuConfig.get("levels");
 		List<TeamLevel> levels = LevelManager.getLevelList();
-
-		int itemRows = Math.max(1, (levels.size() + PER_ROW - 1) / PER_ROW);
-		int rows = Math.min(6, itemRows + 2);
-		inventory = Bukkit.createInventory(this, rows * 9, MenuText.legacy(config.getString("title", "Team Levels")));
-
-		Material filler = MenuConfig.material(config, "filler", Material.BLACK_STAINED_GLASS_PANE);
-		for (int slot = 0; slot < inventory.getSize(); slot++) {
-			inventory.setItem(slot, MenuItems.filler(filler));
-		}
+		inventory = Bukkit.createInventory(this, def.size, MenuText.legacy(def.title));
 
 		int currentLevel = team == null ? -1 : team.getLevel();
-		for (int i = 0; i < levels.size() && i < (rows - 2) * PER_ROW; i++) {
-			int row = 1 + i / PER_ROW;
-			int inRow = Math.min(PER_ROW, levels.size() - (i / PER_ROW) * PER_ROW);
-			int column = 1 + (PER_ROW - inRow) / 2 + i % PER_ROW;
-			inventory.setItem(row * 9 + column, item(config, levels.get(i), team, currentLevel));
+		for (MenuDef.Item item : def.items) {
+			if (item.key.equals("level")) {
+				for (int i = 0; i < levels.size() && i < item.slots.size(); i++) {
+					put(item.slots.get(i), levelItem(def, item, levels.get(i), team, currentLevel), item.commands());
+				}
+			} else {
+				ItemStack stack = MenuItems.item(item.material(Material.STONE), MenuText.legacy(item.name()),
+						MenuText.legacy(item.lore()), false);
+				for (int slot : item.slots) {
+					put(slot, stack, item.commands());
+				}
+			}
 		}
 	}
 
-	private org.bukkit.inventory.ItemStack item(ConfigurationSection config, TeamLevel level, @Nullable Team team, int currentLevel) {
+	private void put(int slot, ItemStack stack, List<String> itemCommands) {
+		if (slot >= 0 && slot < inventory.getSize()) {
+			inventory.setItem(slot, stack);
+			commands.put(slot, itemCommands);
+		}
+	}
+
+	private ItemStack levelItem(MenuDef def, MenuDef.Item item, TeamLevel level, @Nullable Team team, int currentLevel) {
+		ConfigurationSection section = item.section;
 		TeamLevel next = LevelManager.getNextLevel(level.getLevel());
-		String unlimited = config.getString("unlimited", "Unlimited");
-		String symbol = config.getString("money-symbol", "$");
+		String unlimited = def.root.getString("unlimited", "Unlimited");
+		String symbol = def.root.getString("money-symbol", "$");
 
 		List<TagResolver> resolvers = new ArrayList<>(List.of(
 				Placeholder.unparsed("level", String.valueOf(level.getLevel())),
@@ -72,7 +81,6 @@ public class LevelsMenu implements Menu {
 				Placeholder.unparsed("next", String.valueOf(level.getLevel() + 1)),
 				Placeholder.unparsed("members", limit(level.getTeamLimit(), unlimited)),
 				Placeholder.unparsed("chests", limit(level.getMaxChests(), unlimited)),
-				Placeholder.unparsed("warps", limit(level.getMaxWarps(), unlimited)),
 				Placeholder.unparsed("admins", limit(level.getMaxAdmins(), unlimited)),
 				Placeholder.unparsed("owners", limit(level.getMaxOwners(), unlimited)),
 				Placeholder.unparsed("balance", level.getMaxBalance() < 0 ? unlimited : symbol + money(level.getMaxBalance())),
@@ -85,28 +93,31 @@ public class LevelsMenu implements Menu {
 		}
 		TagResolver[] tags = resolvers.toArray(new TagResolver[0]);
 
-		List<String> lore = new ArrayList<>(MenuText.legacy(config.getStringList("lines"), tags));
-		lore.add(MenuText.legacy(""));
-		if (!level.getDescription().isEmpty()) {
-			lore.addAll(MenuText.legacy(level.getDescription(), tags));
-		}
-		if (level.getLevel() > 1) {
-			lore.add(MenuText.legacy(config.getString("requirement", ""), tags));
-		}
-		lore.add(MenuText.legacy(""));
-		if (next == null) {
-			lore.add(MenuText.legacy(config.getString("max", ""), tags));
-		} else {
-			lore.add(MenuText.legacy(config.getString(next.isScoreCost() ? "next-score" : "next-money", ""), tags));
-		}
-
 		boolean current = level.getLevel() == currentLevel;
-		if (current) {
-			lore.add(MenuText.legacy(""));
-			lore.add(MenuText.legacy(config.getString("current", ""), tags));
+		String requirement = level.getLevel() > 1 ? section.getString("requirement", "") : "";
+		String rankup = next == null ? section.getString("max", "")
+				: section.getString(next.isScoreCost() ? "rankup-score" : "rankup-money", "");
+
+		List<String> lore = new ArrayList<>();
+		for (String line : item.lore()) {
+			switch (line.trim()) {
+				case "<description>" -> lore.addAll(MenuText.legacy(level.getDescription(), tags));
+				case "<requirement>" -> addIfSet(lore, requirement, tags);
+				case "<rankup>" -> addIfSet(lore, rankup, tags);
+				case "<current>" -> addIfSet(lore, current ? section.getString("current", "") : "", tags);
+				default -> lore.add(MenuText.legacy(line, tags));
+			}
 		}
 
-		return MenuItems.item(level.getIcon(), MenuText.legacy(config.getString("name", "<name>"), tags), lore, current);
+		Material material = item.material().equalsIgnoreCase("icon") ? level.getIcon() : item.material(level.getIcon());
+		return MenuItems.item(material, MenuText.legacy(item.name(), tags), lore,
+				current && section.getBoolean("glow-current", true));
+	}
+
+	private static void addIfSet(List<String> lore, String text, TagResolver[] tags) {
+		if (!text.isEmpty()) {
+			lore.add(MenuText.legacy(text, tags));
+		}
 	}
 
 	/**
@@ -133,7 +144,10 @@ public class LevelsMenu implements Menu {
 
 	@Override
 	public void click(Player player, int slot) {
-		// view only
+		List<String> list = commands.get(slot);
+		if (list != null) {
+			MenuActions.run(player, list, Map.of("<player>", player.getName()), (tag, argument) -> false);
+		}
 	}
 
 	@Override

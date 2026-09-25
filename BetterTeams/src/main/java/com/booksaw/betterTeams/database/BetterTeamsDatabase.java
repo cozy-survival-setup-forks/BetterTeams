@@ -23,10 +23,6 @@ public class BetterTeamsDatabase extends Database {
 						+ "(teamID) ON DELETE CASCADE, FOREIGN KEY (receivingTeamID) REFERENCES "
 						+ TableName.TEAM + "(teamID) ON DELETE CASCADE");
 
-		createTableIfNotExists(TableName.WARPS,
-				"TeamID VARCHAR(50) NOT NULL, warpInfo VARCHAR(200) NOT NULL, PRIMARY KEY(TeamID, warpInfo), FOREIGN KEY (TeamID) REFERENCES "
-						+ TableName.TEAM + "(teamID) ON DELETE CASCADE");
-
 		createTableIfNotExists(TableName.CHESTCLAIMS,
 				"TeamID VARCHAR(50) NOT NULL, chestLoc VARCHAR(50) NOT NULL, PRIMARY KEY(TeamID, chestLoc), FOREIGN KEY (TeamID) REFERENCES "
 						+ TableName.TEAM + "(teamID) ON DELETE CASCADE");

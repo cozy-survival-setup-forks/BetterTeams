@@ -42,11 +42,6 @@ public class RankCommand extends SubCommand {
 
 			boolean hasHeaderSent = false;
 
-			int warpDiff = nextLevel.getMaxWarps() - currentLevel.getMaxWarps();
-			if (warpDiff > 0) {
-				hasHeaderSent = sendPerkMessage(sender, hasHeaderSent, "rank.perks.warps", warpDiff);
-			}
-
 			int memberDiff = nextLevel.getTeamLimit() - currentLevel.getTeamLimit();
 			if (memberDiff > 0) {
 				hasHeaderSent = sendPerkMessage(sender, hasHeaderSent, "rank.perks.members", memberDiff);

@@ -1,18 +1,16 @@
 package com.booksaw.betterTeams.menu;
 
+import com.booksaw.betterTeams.Main;
 import com.booksaw.betterTeams.PlayerRank;
 import com.booksaw.betterTeams.Team;
 import com.booksaw.betterTeams.TeamPlayer;
 import com.booksaw.betterTeams.message.MessageManager;
-import com.booksaw.betterTeams.Main;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -22,38 +20,36 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
- * /teamlist: every team on the server, click a team to see its members.
+ * /teamlist: every team on the server, click a team to see its members. The layout is in
+ * menus/teamlist.yml and menus/members.yml.
  */
 public class TeamListMenu implements Menu {
 
-	static final int PAGE_SIZE = 45;
-	private static final int SIZE = 54;
-	private static final int PREVIOUS = 47;
-	private static final int RETURN = 49;
-	private static final int NEXT = 51;
-
 	private enum View {TEAMS, MEMBERS}
 
+	private record Click(List<String> commands, UUID entry) {
+	}
+
 	private final View view;
+	private final MenuDef def;
 	private final int page;
 	private final int pageCount;
-	/**
-	 * The team or player shown in each of the first slots
-	 */
-	private final List<UUID> entries;
 	private final UUID teamId;
 	private final int returnPage;
+	private final Map<Integer, Click> clicks = new HashMap<>();
 	private Inventory inventory;
 
-	private TeamListMenu(View view, int page, int pageCount, List<UUID> entries, UUID teamId, int returnPage) {
+	private TeamListMenu(View view, MenuDef def, int page, int pageCount, UUID teamId, int returnPage) {
 		this.view = view;
+		this.def = def;
 		this.page = page;
 		this.pageCount = pageCount;
-		this.entries = entries;
 		this.teamId = teamId;
 		this.returnPage = returnPage;
 	}
@@ -64,31 +60,30 @@ public class TeamListMenu implements Menu {
 	 * Opens the list of teams.
 	 */
 	public static void openTeams(Player player, int requestedPage) {
+		MenuDef def = MenuConfig.get("teamlist");
+		MenuDef.Item entry = def.item("team");
+		int pageSize = pageSize(entry);
+
 		List<Team> teams = Team.getTeamManager().getLoadedTeamListClone().values().stream()
 				.distinct()
 				.sorted(Comparator.comparing(Team::getName, String.CASE_INSENSITIVE_ORDER))
 				.toList();
 
-		int pageCount = pageCount(teams.size());
+		int pageCount = pageCount(teams.size(), pageSize);
 		int page = Math.max(0, Math.min(requestedPage, pageCount - 1));
-		List<Team> visible = teams.stream().skip((long) page * PAGE_SIZE).limit(PAGE_SIZE).toList();
+		List<Team> visible = teams.stream().skip((long) page * pageSize).limit(pageSize).toList();
 
-		ConfigurationSection config = MenuConfig.teamList();
-		TeamListMenu menu = new TeamListMenu(View.TEAMS, page, pageCount, visible.stream().map(Team::getID).toList(), null, 0);
-		menu.inventory = Bukkit.createInventory(menu, SIZE,
-				MenuText.legacy(config.getString("title-teams", "Teams"), pageTags(page, pageCount)));
+		TeamListMenu menu = new TeamListMenu(View.TEAMS, def, page, pageCount, null, 0);
+		TagResolver[] tags = pageTags(page, pageCount);
+		menu.inventory = Bukkit.createInventory(menu, def.size, MenuText.legacy(def.title, tags));
 
-		for (int slot = 0; slot < visible.size(); slot++) {
-			menu.inventory.setItem(slot, teamItem(config, visible.get(slot)));
+		List<ItemStack> stacks = new ArrayList<>();
+		List<UUID> ids = new ArrayList<>();
+		for (Team team : visible) {
+			stacks.add(teamItem(entry, team));
+			ids.add(team.getID());
 		}
-		if (visible.isEmpty()) {
-			ConfigurationSection empty = config.getConfigurationSection("empty");
-			if (empty != null) {
-				menu.inventory.setItem(22, MenuItems.item(Material.BARRIER, MenuText.legacy(empty.getString("name", "")),
-						MenuText.legacy(empty.getStringList("lines")), false));
-			}
-		}
-		menu.addBottomRow(config, "lines-list");
+		menu.draw("team", stacks, ids, teams.isEmpty(), tags);
 		player.openInventory(menu.inventory);
 	}
 
@@ -99,33 +94,40 @@ public class TeamListMenu implements Menu {
 	 */
 	public static void openMembers(Player player, UUID teamId, int requestedPage, int returnPage) {
 		Team team = Team.getTeam(teamId);
-		ConfigurationSection config = MenuConfig.teamList();
+		MenuDef def = MenuConfig.get("members");
 		if (team == null) {
-			player.sendMessage(MenuText.legacy(config.getString("gone", "That team no longer exists.")));
+			player.sendMessage(MenuText.legacy(MenuConfig.get("teamlist").root.getString("gone",
+					"That team no longer exists.")));
 			openTeams(player, returnPage);
 			return;
 		}
 
+		MenuDef.Item entry = def.item("member");
+		int pageSize = pageSize(entry);
 		List<TeamPlayer> members = members(team);
-		int pageCount = pageCount(members.size());
+		int pageCount = pageCount(members.size(), pageSize);
 		int page = Math.max(0, Math.min(requestedPage, pageCount - 1));
-		List<TeamPlayer> visible = members.stream().skip((long) page * PAGE_SIZE).limit(PAGE_SIZE).toList();
+		List<TeamPlayer> visible = members.stream().skip((long) page * pageSize).limit(pageSize).toList();
 
-		TeamListMenu menu = new TeamListMenu(View.MEMBERS, page, pageCount,
-				visible.stream().map(TeamPlayer::getPlayerUUID).toList(), team.getID(), returnPage);
-		TagResolver[] titleTags = {Placeholder.unparsed("team", MenuText.strip(team.getName())),
+		TeamListMenu menu = new TeamListMenu(View.MEMBERS, def, page, pageCount, team.getID(), returnPage);
+		TagResolver[] tags = {Placeholder.unparsed("team", MenuText.strip(team.getName())),
 				Placeholder.unparsed("page", String.valueOf(page + 1)), Placeholder.unparsed("pages", String.valueOf(pageCount))};
-		menu.inventory = Bukkit.createInventory(menu, SIZE, MenuText.legacy(config.getString("title-members", "Teams"), titleTags));
+		menu.inventory = Bukkit.createInventory(menu, def.size, MenuText.legacy(def.title, tags));
 
-		for (int slot = 0; slot < visible.size(); slot++) {
-			menu.inventory.setItem(slot, memberItem(config, visible.get(slot)));
+		List<ItemStack> stacks = new ArrayList<>();
+		for (TeamPlayer member : visible) {
+			stacks.add(memberItem(entry, member));
 		}
-		menu.addBottomRow(config, "lines-members");
+		menu.draw("member", stacks, new ArrayList<>(), false, tags);
 		player.openInventory(menu.inventory);
 	}
 
-	private static int pageCount(int entries) {
-		return Math.max(1, (entries + PAGE_SIZE - 1) / PAGE_SIZE);
+	private static int pageSize(MenuDef.Item entry) {
+		return entry == null ? 1 : Math.max(1, entry.slots.size());
+	}
+
+	private static int pageCount(int entries, int pageSize) {
+		return Math.max(1, (entries + pageSize - 1) / pageSize);
 	}
 
 	private static TagResolver[] pageTags(int page, int pageCount) {
@@ -133,41 +135,58 @@ public class TeamListMenu implements Menu {
 				Placeholder.unparsed("pages", String.valueOf(pageCount))};
 	}
 
-	// ---- items ----
+	// ---- drawing ----
 
-	private void addBottomRow(ConfigurationSection config, String returnLines) {
-		Material filler = MenuConfig.material(config, "filler", Material.BLACK_STAINED_GLASS_PANE);
-		for (int slot = PAGE_SIZE; slot < SIZE; slot++) {
-			inventory.setItem(slot, MenuItems.filler(filler));
-		}
-
-		if (page > 0) {
-			inventory.setItem(PREVIOUS, button(config.getConfigurationSection("previous"), Material.RED_STAINED_GLASS_PANE, "lines"));
-		}
-		inventory.setItem(RETURN, button(config.getConfigurationSection("return"), Material.GLOBE_BANNER_PATTERN, returnLines));
-		if (page + 1 < pageCount) {
-			inventory.setItem(NEXT, button(config.getConfigurationSection("next"), Material.LIME_STAINED_GLASS_PANE, "lines"));
+	/**
+	 * Draws the items of the menu file in order, so later items cover earlier ones.
+	 *
+	 * @param entryKey the item that is drawn once for every team or member
+	 * @param stacks   those items
+	 * @param ids      the team behind each of them, empty for members
+	 * @param empty    whether there is nothing to list
+	 */
+	private void draw(String entryKey, List<ItemStack> stacks, List<UUID> ids, boolean empty, TagResolver[] tags) {
+		for (MenuDef.Item item : def.items) {
+			if (item.key.equals(entryKey)) {
+				for (int i = 0; i < stacks.size() && i < item.slots.size(); i++) {
+					put(item.slots.get(i), stacks.get(i), item.commands(), i < ids.size() ? ids.get(i) : null);
+				}
+			} else if (visible(item.requirement(), empty)) {
+				ItemStack stack = MenuItems.item(item.material(Material.STONE), MenuText.legacy(item.name(), tags),
+						MenuText.legacy(item.lore(), tags), false);
+				for (int slot : item.slots) {
+					put(slot, stack, item.commands(), null);
+				}
+			}
 		}
 	}
 
-	private static ItemStack button(ConfigurationSection section, Material material, String linesKey) {
-		if (section == null) {
-			return MenuItems.item(material, " ", List.of(), false);
+	private void put(int slot, ItemStack stack, List<String> commands, UUID entry) {
+		if (slot >= 0 && slot < inventory.getSize()) {
+			inventory.setItem(slot, stack);
+			clicks.put(slot, new Click(commands, entry));
 		}
-		return MenuItems.item(material, MenuText.legacy(section.getString("name", " ")),
-				MenuText.legacy(section.getStringList(linesKey)), false);
 	}
 
-	private static ItemStack teamItem(ConfigurationSection config, Team team) {
-		ConfigurationSection section = config.getConfigurationSection("team");
-		if (section == null) {
+	private boolean visible(String requirement, boolean empty) {
+		return switch (requirement.toLowerCase(java.util.Locale.ROOT)) {
+			case "has_previous" -> page > 0;
+			case "has_next" -> page + 1 < pageCount;
+			case "empty" -> empty;
+			case "not_empty" -> !empty;
+			default -> true;
+		};
+	}
+
+	private static ItemStack teamItem(MenuDef.Item item, Team team) {
+		if (item == null) {
 			return new ItemStack(Material.WHITE_BANNER);
 		}
 
 		String accent = accent(team.getColor());
 		List<String> description = MenuText.wrap(team.getDescription(), 38, 3);
 		if (description.isEmpty()) {
-			description.add(section.getString("no-description", "No description set."));
+			description.add(item.section.getString("no-description", "No description set."));
 		}
 
 		TagResolver[] tags = {
@@ -178,7 +197,7 @@ public class TeamListMenu implements Menu {
 		};
 
 		List<String> lore = new ArrayList<>();
-		for (String line : section.getStringList("lines")) {
+		for (String line : item.lore()) {
 			if (line.contains("<description>")) {
 				for (String text : description) {
 					lore.add(MenuText.legacy(line.replace("<description>", "<white>" + MenuText.plain(text)), tags));
@@ -187,15 +206,17 @@ public class TeamListMenu implements Menu {
 				lore.add(MenuText.legacy(line, tags));
 			}
 		}
-		return MenuItems.item(banner(team.getColor()), MenuText.legacy(section.getString("name", "<team>"), tags), lore, false);
+		Material material = item.material().equalsIgnoreCase("banner") ? banner(team.getColor())
+				: item.material(Material.WHITE_BANNER);
+		return MenuItems.item(material, MenuText.legacy(item.name(), tags), lore, false);
 	}
 
-	private static ItemStack memberItem(ConfigurationSection config, TeamPlayer member) {
-		ConfigurationSection section = config.getConfigurationSection("member");
-		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
-		if (section == null || !(item.getItemMeta() instanceof SkullMeta meta)) {
-			return item;
+	private static ItemStack memberItem(MenuDef.Item item, TeamPlayer member) {
+		ItemStack stack = new ItemStack(item == null ? Material.PLAYER_HEAD : item.material(Material.PLAYER_HEAD));
+		if (item == null) {
+			return stack;
 		}
+		ConfigurationSection section = item.section;
 
 		String name = member.getPlayer().getName();
 		String rank;
@@ -223,11 +244,13 @@ public class TeamListMenu implements Menu {
 				Placeholder.unparsed("status", section.getString(online ? "online" : "offline", online ? "Online" : "Offline"))
 		};
 
-		meta.setOwningPlayer(member.getPlayer());
-		MenuItems.decorate(meta, MenuText.legacy(section.getString("name", "<player>"), tags),
-				MenuText.legacy(section.getStringList("lines"), tags), false);
-		item.setItemMeta(meta);
-		return item;
+		if (stack.getItemMeta() instanceof SkullMeta meta) {
+			meta.setOwningPlayer(member.getPlayer());
+			MenuItems.decorate(meta, MenuText.legacy(item.name(), tags), MenuText.legacy(item.lore(), tags), false);
+			stack.setItemMeta(meta);
+			return stack;
+		}
+		return MenuItems.item(stack.getType(), MenuText.legacy(item.name(), tags), MenuText.legacy(item.lore(), tags), false);
 	}
 
 	// ---- team information ----
@@ -313,34 +336,51 @@ public class TeamListMenu implements Menu {
 
 	@Override
 	public void click(Player player, int slot) {
-		switch (slot) {
-			case PREVIOUS -> {
+		Click click = clicks.get(slot);
+		if (click == null) {
+			return;
+		}
+		Map<String, String> replace = new HashMap<>();
+		Team team = Team.getTeam(click.entry() != null ? click.entry() : teamId);
+		if (team != null) {
+			replace.put("<team>", MenuText.strip(team.getName()));
+		}
+		replace.put("<player>", player.getName());
+		MenuActions.run(player, click.commands(), replace, (tag, argument) -> handle(player, click, tag, argument));
+	}
+
+	private boolean handle(Player player, Click click, String tag, String argument) {
+		switch (tag) {
+			case "previous" -> {
 				if (page > 0) {
-					sound(player, true);
 					show(player, page - 1);
 				}
 			}
-			case RETURN -> {
-				sound(player, true);
-				if (view == View.MEMBERS) {
-					openTeams(player, returnPage);
-				} else {
-					closeOrCommand(player);
-				}
-			}
-			case NEXT -> {
+			case "next" -> {
 				if (page + 1 < pageCount) {
-					sound(player, false);
 					show(player, page + 1);
 				}
 			}
-			default -> {
-				if (view == View.TEAMS && slot >= 0 && slot < entries.size()) {
-					sound(player, false);
-					openMembers(player, entries.get(slot), 0, page);
+			case "back" -> {
+				if (view == View.MEMBERS) {
+					openTeams(player, returnPage);
+				} else {
+					player.closeInventory();
 				}
 			}
+			case "openmenu" -> {
+				if (!argument.equalsIgnoreCase("members")) {
+					return false;
+				}
+				if (view == View.TEAMS && click.entry() != null) {
+					openMembers(player, click.entry(), 0, page);
+				}
+			}
+			default -> {
+				return false;
+			}
 		}
+		return true;
 	}
 
 	private void show(Player player, int newPage) {
@@ -349,27 +389,6 @@ public class TeamListMenu implements Menu {
 		} else {
 			openMembers(player, teamId, newPage, returnPage);
 		}
-	}
-
-	private void closeOrCommand(Player player) {
-		String command = MenuConfig.teamList().getConfigurationSection("return") == null ? ""
-				: MenuConfig.teamList().getString("return.command", "");
-		Bukkit.getScheduler().runTask(Main.plugin, () -> {
-			if (!player.isOnline()) {
-				return;
-			}
-			if (command == null || command.isBlank()) {
-				player.closeInventory();
-			} else {
-				player.performCommand(command.startsWith("/") ? command.substring(1) : command);
-			}
-		});
-	}
-
-	private static void sound(Player player, boolean back) {
-		player.playSound(player.getLocation(), Sound.UI_BUTTON_CLICK, SoundCategory.MASTER, 1.0f, 1.0f);
-		player.playSound(player.getLocation(), back ? Sound.BLOCK_NOTE_BLOCK_BASS : Sound.BLOCK_AMETHYST_BLOCK_RESONATE,
-				SoundCategory.MASTER, back ? 0.3f : 1.0f, 1.0f);
 	}
 
 	@Override

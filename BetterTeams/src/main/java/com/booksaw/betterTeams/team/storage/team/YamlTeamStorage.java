@@ -2,7 +2,6 @@ package com.booksaw.betterTeams.team.storage.team;
 
 import com.booksaw.betterTeams.Team;
 import com.booksaw.betterTeams.TeamPlayer;
-import com.booksaw.betterTeams.Warp;
 import com.booksaw.betterTeams.team.meta.TeamMeta;
 import com.booksaw.betterTeams.team.storage.storageManager.YamlStorageManager;
 import org.bukkit.configuration.ConfigurationSection;
@@ -146,15 +145,7 @@ public abstract class YamlTeamStorage extends TeamStorage {
 		setValue("allyrequests", TeamStorageType.STRING, players);
 	}
 
-	@Override
-	public List<String> getWarps() {
-		return getConfig().getStringList("warps");
-	}
 
-	@Override
-	public void setWarps(List<String> warps) {
-		setValue("warps", TeamStorageType.STRING, warps);
-	}
 
 	@Override
 	public List<String> getClaimedChests() {
@@ -204,15 +195,7 @@ public abstract class YamlTeamStorage extends TeamStorage {
 		// not needed
 	}
 
-	@Override
-	public void addWarp(Warp component) {
-		// not needed
-	}
 
-	@Override
-	public void removeWarp(Warp component) {
-		// not needed
-	}
 
 	@Override
 	public void promotePlayer(TeamPlayer promotePlayer) {

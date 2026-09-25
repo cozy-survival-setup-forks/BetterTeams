@@ -1,0 +1,119 @@
+# /teamlist: every team on the server, click one to see its members.
+# Reload with /teamadmin reload. The layout works like a DeluxeMenus menu: every entry under items has a
+# material, slot or slots, display_name, lore and click_commands. Items further down are drawn over
+# items further up. Text is MiniMessage (<green>text</green>), & codes work too.
+#
+# Tags: <page> <pages> in the title and every item.
+# In the team item: <team> <leader> <members> <description>, and <accent> for the colour of the team.
+#
+# material of the team item can be "banner" for the banner in the colour of the team.
+# view_requirement: has_previous, has_next, empty (no teams). Leave it out to always show the item.
+#
+# click_commands:
+#   [player] <command>   run as the player
+#   [console] <command>  run by the console, <team> is the team that was clicked
+#   [sound] NAME [volume] [pitch]
+#   [close]              close the menu
+#   [previous] [next]    change page
+#   [openmenu] members   the members of the team that was clicked
+#   [openmenu] teamlist  or levels
+menu_title: "<black>| Teams - List (<page>/<pages>)"
+size: 54
+
+# shown when a team is deleted while a player is looking at it
+gone: "<#FFEE64><bold>TEAMS</bold> <#B6C1C8>⏵ <white>That team no longer exists."
+
+items:
+  filler:
+    material: BLACK_STAINED_GLASS_PANE
+    display_name: " "
+    slots: [45-53]
+
+  # drawn once for every team on the page, filled into these slots in order
+  team:
+    material: banner
+    slots: [0-44]
+    display_name: "<accent><bold><team>"
+    lore:
+      - "<#B6C1C8>Teams"
+      - ""
+      - "<#FF9558>Description:"
+      - "<description>"
+      - ""
+      - "<#FF9558>Information:"
+      - "<#74C7FF>★ <white>Leader: <#74C7FF><leader>"
+      - "<#FFE05A>⚡ <white>Members: <#FFE05A><members>"
+      - ""
+      - "<#FF9558>⏵ <bold><underlined>CLICK</underlined></bold> to View Members"
+    # <description> is up to 3 lines, this is used when the team has none
+    no-description: "No description set."
+    click_commands:
+      - "[sound] UI_BUTTON_CLICK"
+      - "[sound] BLOCK_AMETHYST_BLOCK_RESONATE"
+      - "[openmenu] members"
+
+  empty:
+    material: BARRIER
+    slot: 22
+    view_requirement: empty
+    display_name: "<#FF4361><bold>NO TEAMS FOUND"
+    lore:
+      - "<#B6C1C8>Teams"
+      - ""
+      - "<#FF9558>Description:"
+      - "<white>There are currently no"
+      - "<white>teams to display."
+
+  previous:
+    material: RED_STAINED_GLASS_PANE
+    slot: 47
+    view_requirement: has_previous
+    display_name: "<#FF4361><bold>PREVIOUS PAGE"
+    lore:
+      - "<#B6C1C8>Teams"
+      - ""
+      - "<#FF9558>Description:"
+      - "<white>Click this button to"
+      - "<white>return to the previous page."
+      - ""
+      - "<#FF9558>⏵ <bold><underlined>CLICK</underlined></bold> to Continue"
+    click_commands:
+      - "[sound] UI_BUTTON_CLICK"
+      - "[sound] BLOCK_AMETHYST_BLOCK_RESONATE"
+      - "[previous]"
+
+  return:
+    material: GLOBE_BANNER_PATTERN
+    slot: 49
+    display_name: "<#FF4361><bold>RETURN"
+    lore:
+      - "<#B6C1C8>Teams"
+      - ""
+      - "<#FF9558>Description:"
+      - "<white>Click this button to"
+      - "<white>close this menu."
+      - ""
+      - "<#FF9558>⏵ <bold><underlined>CLICK</underlined></bold> to Return"
+    # to go back to another menu use [player] <command> instead of [close]
+    click_commands:
+      - "[sound] UI_BUTTON_CLICK"
+      - "[sound] BLOCK_NOTE_BLOCK_BASS 0.3"
+      - "[close]"
+
+  next:
+    material: LIME_STAINED_GLASS_PANE
+    slot: 51
+    view_requirement: has_next
+    display_name: "<#41FF75><bold>NEXT PAGE"
+    lore:
+      - "<#B6C1C8>Teams"
+      - ""
+      - "<#FF9558>Description:"
+      - "<white>Click this button to"
+      - "<white>continue to the next page."
+      - ""
+      - "<#FF9558>⏵ <bold><underlined>CLICK</underlined></bold> to Continue"
+    click_commands:
+      - "[sound] UI_BUTTON_CLICK"
+      - "[sound] BLOCK_AMETHYST_BLOCK_RESONATE"
+      - "[next]"

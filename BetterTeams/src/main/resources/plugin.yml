@@ -202,27 +202,6 @@ permissions:
   betterTeams.list:
     default: true
     description: gives access to the command /team list
-  betterTeams.warp:
-    default: true
-    description: gives access to the command /team warp
-  betterTeams.warps:
-    default: true
-    description: gives access to the command /team warps
-  betterTeams.setwarp:
-    default: true
-    description: gives access to the command /team setwarp
-  betterTeams.delwarp:
-    default: true
-    description: gives access to the command /team delwarp
-  betterTeams.admin.warp:
-    default: op
-    description: gives access to the command /teama warp
-  betterTeams.admin.setwarp:
-    default: op
-    description: gives access to the command /teama setwarp
-  betterTeams.admin.delwarp:
-    default: op
-    description: gives access to the command /teama delwarp
   betterTeams.admin.setrank:
     default: op
     description: gives access to the command /teama setrank

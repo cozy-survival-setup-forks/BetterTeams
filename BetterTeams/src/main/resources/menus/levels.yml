@@ -1,0 +1,49 @@
+# /team levels: every level with its limits and what it costs to reach.
+# Same format as teamlist.yml. Reload with /teamadmin reload.
+#
+# The level item is drawn once for every level, filled into its slots in order.
+# material: icon uses the icon of the level from levels.yml.
+# Tags: <level> <name> <previous> <next> <members> <chests> <admins> <owners> <balance> <price>
+#       <team> <next-name> <next-price>
+# In lore, a line that is only <description> becomes the description of the level from levels.yml, and
+# these lines become the texts below, or nothing when they do not apply:
+#   <requirement>  from level 2 up
+#   <rankup>       rankup-money or rankup-score, or max on the last level
+#   <current>      only on the level the team is at (the item also glows when glow-current is true)
+menu_title: "<black>| Team Levels"
+size: 45
+
+# how -1 is written, and what goes in front of money
+unlimited: "Unlimited"
+money-symbol: "$"
+
+items:
+  filler:
+    material: BLACK_STAINED_GLASS_PANE
+    display_name: " "
+    slots: [0-44]
+
+  level:
+    material: icon
+    slots: [10-16, 19-25, 28-34]
+    display_name: "<green><bold><name>"
+    lore:
+      - "<gray>Team Levels"
+      - ""
+      - "<green>Limits:"
+      - "<gray>➥ <white>Player Limit: <green><members>"
+      - "<gray>➥ <white>Chest Limit: <green><chests>"
+      - "<gray>➥ <white>Admin Limit: <green><admins>"
+      - "<gray>➥ <white>Balance Limit: <green><balance>"
+      - ""
+      - "<description>"
+      - "<requirement>"
+      - ""
+      - "<rankup>"
+      - "<current>"
+    glow-current: true
+    requirement: "<white>Your team must be level <green><previous><white> to rankup to this level."
+    rankup-money: "<white>Rank up to level <green><next><white> by having <green><next-price><white> in the team bank and doing <green>/team rankup<white>."
+    rankup-score: "<white>Rank up to level <green><next><white> by having <green><next-price> score<white> and doing <green>/team rankup<white>."
+    max: "<white>This is the Maximum Team Level."
+    current: "<yellow>Your team is at this level."

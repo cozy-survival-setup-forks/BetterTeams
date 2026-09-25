@@ -304,13 +304,6 @@ singleOwner: false
 # Possible Values: [true, false]
 enforceTag: false
 
-# This is used to determine if a warp is allowed to have a password set which can be used to limit usage across the team
-# - If this is true, a password can be set for a warp, so only users with that password can teleport to it
-# 
-# Possible values: [true, false]
-#
-allowPassword: true
-
 # This is used to determine if players can open claimed chests of their allies or not
 # - If this is set to true, allies will be able to open claimed chests 
 # - If this is set to false, allies will not be able to open claimed chests

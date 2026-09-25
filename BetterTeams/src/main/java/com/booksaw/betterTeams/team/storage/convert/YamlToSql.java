@@ -139,12 +139,6 @@ public class YamlToSql extends Converter {
 				}
 
 			}
-			// warps
-			for (String temp : config.getStringList("warps")) {
-				database.insertRecordIfNotExists(TableName.WARPS, "teamID, warpInfo",
-						teamName.toString(), temp);
-			}
-
 			current++;
 			log("Saved team " + teamName + "(" + current + "/" + size + ")");
 			f.delete();

@@ -55,7 +55,6 @@ rank.infom: '&6Team rank: &b{0} &7(${1} needed for next rankup)'
 rank.infomm: '&6Team rank: &b{0} &7(You are the max rank)'
 rank.syntax: '&b{0}: &6{1} &7({2})'
 rank.perks.header: '&6&lNext Level Perks:'
-rank.perks.warps: '&7- &a+{0} &7Max Warps'
 rank.perks.members: '&7- &a+{0} &7Max Members'
 rank.perks.chests: '&7- &a+{0} &7Max Chest Claims'
 rank.perks.bank: '&7- &aIncreased Bank Limit (&e${0}&a)'
@@ -115,7 +114,7 @@ info.offline: '&c'
 info.onlinePlayer: '<green>{0}</green>'
 info.offlinePlayer: '<red>{0}</red>'
 info.playerListSpace: " "
-info.limits: '&6Limits: &7Members &b{0}/{1} &7| &7Warps &b{2}/{3}'
+info.limits: '&6Limits: &7Members &b{0}/{1}'
 kick.success: '&6That player has been kicked'
 kick.notify: '&6You have been kicked from team &b{0}'
 kick.title: '&4You have been kicked from your team'
@@ -199,17 +198,6 @@ setowner.use: '&6You cannot promote that player, use &b/team setowner <player> &
 setowner.success: '&6That player is now owner'
 setowner.notify: '&6You are now owner of your team'
 setowner.max: '&4That player is already owner'
-setwarp.exist: '&4That warp already exists'
-setwarp.max: '&4Your team already has the maximum number of warps set'
-setwarp.success: '&6That warp has been created'
-setwarp.char: '&4That warp name includes banned characters'
-warp.nowarp: '&4That warp does not exist'
-warp.invalidPassword: '&4Invalid password for that warp'
-warp.success: '&6You have been teleported'
-warps.syntax: '&6Warps: &b{0}'
-warps.none: '&4Your team has no warps set'
-warp.world: '&4The location of that warp could not be found'
-delwarp.success: '&4That warp has been deleted'
 chat.syntax: '&b[Team]&f{0}&f: {1}'
 teleport.fail: '&4The teleportation failed'
 teleport.wait: '&6Stand still for &b{0} &6seconds to teleport'
@@ -302,9 +290,6 @@ admin.setowner.already: '&4That player is already an owner'
 admin.setowner.nonotify: '&6You are no longer owner of the team'
 admin.setowner.success: '&6That player is the new team owner'
 admin.setowner.notify: '&6You are now the owner of your team'
-admin.warps.none: '&4That team has not set any warps'
-admin.setwarp.success: '&6That warp has been set'
-admin.setwarp.max: '&6That team has already set the maximum number of warps'
 admin.purge.confirm: '&6Run that command in the next 10 seconds to confirm, &4THIS CANNOT BE UNDONE AND WILL RESET SCORES FOR ALL TEAMS'
 admin.purge.success: '&6The teams have been purged'
 admin.score.tooSmall: '&4The score must be greater than 0'
@@ -407,12 +392,10 @@ helpArg.echest: ''
 helpArg.color: <color code>
 helpArg.allychat: '[message]'
 helpArg.description: '[description]'
-helpArg.setwarp: <name> [password]
 helpArg.title: '[player/me] [title]'
 helpArg.bal: ''
 helpArg.ban: <player>
 helpArg.promote: <player>
-helpArg.warps: ''
 helpArg.top: ''
 helpArg.ally: <team>
 helpArg.rankup: ''
@@ -425,7 +408,6 @@ helpArg.join: <team>
 helpArg.tag: '[tag]'
 helpArg.disband: ''
 helpArg.info: '[team/player]'
-helpArg.delwarp: <name> [password]
 helpArg.chest: ''
 helpArg.neutral: <team>
 helpArg.pvp: ''
@@ -441,7 +423,6 @@ helpArg.name: <name>
 helpArg.deposit: <amount>
 helpArg.invite: <player>
 helpArg.open: ''
-helpArg.warp: <name>
 helpArg.withdraw: <amount>
 helpArg.anchor: ''
 helpArg.setanchor: '<true/false>'
@@ -473,10 +454,6 @@ command.ally: ally
 command.neutral: neutral
 command.allychat: allychat
 command.list: list
-command.warp: warp
-command.setwarp: setwarp
-command.delwarp: delwarp
-command.warps: warps
 command.echest: echest
 command.rankup: rankup
 command.levels: levels
